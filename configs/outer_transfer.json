@@ -1,0 +1,34 @@
+{
+  "phase": "outer",
+  "datasets": [
+    "MUTAG",
+    "NCI1",
+    "ENZYMES",
+    "DD",
+    "IMDB-MULTI"
+  ],
+  "partitions": [
+    27101,
+    27102,
+    27103
+  ],
+  "initializations": [
+    27201,
+    27202,
+    27203,
+    27204,
+    27205
+  ],
+  "regimes": [
+    "clean",
+    "perturbed",
+    "displaced"
+  ],
+  "split_seed": 27002,
+  "arms": [
+    "PCOC",
+    "Unscreened",
+    "Census-Audit",
+    "Frozen"
+  ]
+}

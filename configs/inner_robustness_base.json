@@ -1,0 +1,32 @@
+{
+  "phase": "inner",
+  "datasets": [
+    "PROTEINS",
+    "IMDB-BINARY"
+  ],
+  "partitions": [
+    17,
+    29,
+    43
+  ],
+  "initializations": [
+    17,
+    29,
+    43
+  ],
+  "regimes": [
+    "clean",
+    "perturbed",
+    "displaced",
+    "canceling",
+    "reinforcing"
+  ],
+  "paired_inner_seeds": true,
+  "arms": [
+    "PCOC",
+    "Unscreened"
+  ],
+  "profile_memory": true,
+  "census": "nominated",
+  "log_predictions": false
+}

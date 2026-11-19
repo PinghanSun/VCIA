@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vcia-research-artifact"
+version = "0.1.0"
+description = "Experimental artifact for VCIA version admission in decentralized federated graph clustering"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = ["numpy>=1.26,<3", "scipy>=1.12,<2", "scikit-learn>=1.4,<2", "threadpoolctl>=3.2,<4"]
+
+[project.optional-dependencies]
+test = ["pytest>=8,<10"]
+
+[project.scripts]
+pcoc = "pcoc.__main__:main"
+pcoc-analysis = "pcoc.analysis:main"
+pcoc-numerical = "legacy.__main__:main"
+
+[tool.setuptools]
+packages = ["pcoc", "legacy", "legacy.wl_pilot"]
+include-package-data = false
+
+[tool.setuptools.package-dir]
+pcoc = "src/pcoc"
+legacy = "legacy"
+
+[tool.setuptools.package-data]
+legacy = ["*.json"]
+"legacy.wl_pilot" = ["provenance.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

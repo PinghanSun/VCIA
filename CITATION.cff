@@ -1,0 +1,8 @@
+cff-version: 1.2.0
+message: "Cite this artifact and the accompanying VCIA manuscript when using this code."
+title: "VCIA: Auditing Update Combinations in Decentralized Federated Graph-Level Clustering"
+type: software
+repository-code: "https://github.com/PinghanSun/VCIA"
+version: 0.1.0
+authors:
+  - name: "Anonymous Authors"

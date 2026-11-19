@@ -1,0 +1,289 @@
+{
+  "base": "inner_robustness_base.json",
+  "groups": {
+    "heterogeneity": [
+      {
+        "partition_alpha": 0.1
+      },
+      {
+        "partition_alpha": 0.3
+      },
+      {
+        "partition_alpha": 0.5
+      },
+      {
+        "partition_alpha": 1
+      },
+      {
+        "partition_alpha": 10
+      }
+    ],
+    "compromised": [
+      {
+        "compromised": []
+      },
+      {
+        "compromised": [
+          1
+        ]
+      },
+      {
+        "compromised": [
+          1,
+          5
+        ]
+      },
+      {
+        "compromised": [
+          1,
+          5,
+          7
+        ]
+      }
+    ],
+    "design-draws": [
+      {
+        "design_draws": 128
+      },
+      {
+        "design_draws": 256
+      },
+      {
+        "design_draws": 512
+      },
+      {
+        "design_draws": 1024
+      }
+    ],
+    "verify-draws": [
+      {
+        "verify_draws": 2048
+      },
+      {
+        "verify_draws": 4096
+      },
+      {
+        "verify_draws": 8192
+      },
+      {
+        "verify_draws": 16384
+      },
+      {
+        "verify_draws": 32768
+      },
+      {
+        "verify_draws": 40960
+      },
+      {
+        "verify_draws": 49152
+      },
+      {
+        "verify_draws": 65536
+      }
+    ],
+    "screen-tolerance": [
+      {
+        "decision": {
+          "kappa": 0.05
+        }
+      },
+      {
+        "decision": {
+          "kappa": 0.1
+        }
+      },
+      {
+        "decision": {
+          "kappa": 0.2
+        }
+      }
+    ],
+    "drift-tolerance": [
+      {
+        "decision": {
+          "chi": 0.01
+        }
+      },
+      {
+        "decision": {
+          "chi": 0.02
+        }
+      },
+      {
+        "decision": {
+          "chi": 0.05
+        }
+      }
+    ],
+    "flip-tolerance": [
+      {
+        "decision": {
+          "gamma": 0.005
+        }
+      },
+      {
+        "decision": {
+          "gamma": 0.01
+        }
+      },
+      {
+        "decision": {
+          "gamma": 0.02
+        }
+      },
+      {
+        "decision": {
+          "gamma": 0.05
+        }
+      }
+    ],
+    "design-slack": [
+      {
+        "decision": {
+          "eta": 0.6
+        }
+      },
+      {
+        "decision": {
+          "eta": 0.7
+        }
+      },
+      {
+        "decision": {
+          "eta": 0.8
+        }
+      },
+      {
+        "decision": {
+          "eta": 0.9
+        }
+      }
+    ],
+    "detectability": [
+      {
+        "decision": {
+          "nu": 0
+        }
+      },
+      {
+        "decision": {
+          "nu": 0.00001
+        }
+      },
+      {
+        "decision": {
+          "nu": 0.0001
+        }
+      },
+      {
+        "decision": {
+          "nu": 0.001
+        }
+      }
+    ],
+    "age-cap": [
+      {
+        "decision": {
+          "age_cap": 10
+        }
+      },
+      {
+        "decision": {
+          "age_cap": 30
+        }
+      },
+      {
+        "decision": {
+          "age_cap": 60
+        }
+      }
+    ],
+    "local-steps": [
+      {
+        "local_steps": 1
+      },
+      {
+        "local_steps": 2
+      },
+      {
+        "local_steps": 4
+      }
+    ],
+    "availability": [
+      {
+        "missing_fraction": 0
+      },
+      {
+        "missing_fraction": 0.1
+      },
+      {
+        "missing_fraction": 0.2
+      },
+      {
+        "missing_fraction": 0.3
+      },
+      {
+        "missing_fraction": 0.5
+      }
+    ],
+    "availability-bursts": [
+      {
+        "missing_fraction": 0,
+        "missing_block": 4
+      },
+      {
+        "missing_fraction": 0.1,
+        "missing_block": 4
+      },
+      {
+        "missing_fraction": 0.2,
+        "missing_block": 4
+      },
+      {
+        "missing_fraction": 0.3,
+        "missing_block": 4
+      },
+      {
+        "missing_fraction": 0.5,
+        "missing_block": 4
+      }
+    ],
+    "topology": [
+      {
+        "topology": "ring"
+      },
+      {
+        "topology": "exponential"
+      },
+      {
+        "topology": "dynamic"
+      }
+    ],
+    "quota": [
+      {
+        "peers": 8,
+        "quota": 6
+      },
+      {
+        "peers": 10,
+        "quota": 7
+      },
+      {
+        "peers": 12,
+        "quota": 9
+      },
+      {
+        "peers": 16,
+        "quota": 11
+      }
+    ],
+    "memory": [
+      {
+        "poisoned_memory": false
+      },
+      {
+        "poisoned_memory": true
+      }
+    ]
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "phase": "outer",
+  "datasets": [
+    "PROTEINS",
+    "IMDB-BINARY"
+  ],
+  "partitions": [
+    27101
+  ],
+  "initializations": [
+    27201
+  ],
+  "regimes": [
+    "clean",
+    "perturbed",
+    "displaced"
+  ],
+  "arms": [
+    "PCOC",
+    "Census-Audit",
+    "No-Verify"
+  ],
+  "backend": "loopback"
+}

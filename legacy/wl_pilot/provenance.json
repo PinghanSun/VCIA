@@ -1,0 +1,13 @@
+{
+  "source": "work/PCOC_Graph_Learning_Pilot_20261118",
+  "source_sha256": {
+    "run_pilot.py": "8648a62100a09ade7eff49425f572950d643347855581fb3cd176252d80d2ff5",
+    "run_imdb_pilot.py": "3cd49ce8891589ab42d2c7695e25a001f5f786c801a060a2b148236c5edec7fe",
+    "learner.py": "6de54e99181de6d406eed341418ccb05b58de1523208deba566636637e9df343",
+    "decision.py": "0782f73ab988cde19b613b0c0556fc36c12a9453fb840baee8ba88e082492594",
+    "replay_design.py": "4b3ae9d3717a58eed2a4018a98a74dabbaa0b7ccb531222904d7b41122f030ee",
+    "calibration.py": "3ce0022eced1c758a1f08f73e87d8d9b780fdf45b1f86e22662aecdefb560563",
+    "calibrate_budget.py": "986db9db21a9080f6c58e92d1a5f04f213efe1260f8126cea2ed6fe746ede453",
+    "verify_artifacts.py": "2d9496b90691199f53b9f7e714c8b17da5017d7220b0e3883ce344f28bcb68ea"
+  }
+}

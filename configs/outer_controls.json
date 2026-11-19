@@ -1,0 +1,30 @@
+{
+  "phase": "outer",
+  "datasets": [
+    "PROTEINS",
+    "IMDB-BINARY"
+  ],
+  "partitions": [
+    27101,
+    27102,
+    27103
+  ],
+  "initializations": [
+    27201,
+    27202,
+    27203,
+    27204,
+    27205
+  ],
+  "regimes": [
+    "clean",
+    "perturbed",
+    "displaced"
+  ],
+  "arms": [
+    "PCOC",
+    "J-Rank",
+    "Frozen",
+    "Unprotected"
+  ]
+}

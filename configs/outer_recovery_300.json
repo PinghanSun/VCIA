@@ -1,0 +1,11 @@
+{
+  "phase": "outer",
+  "datasets": ["PROTEINS", "NCI1"],
+  "partitions": [27101, 27102, 27103],
+  "initializations": [27201, 27202, 27203, 27204, 27205],
+  "regimes": ["clean", "displaced", "reinforcing"],
+  "arms": ["PCOC", "J-Rank", "Unscreened", "Census-Direct", "Frozen", "Unprotected"],
+  "rounds": 300,
+  "stress_start": 51,
+  "stress_end": 200
+}
