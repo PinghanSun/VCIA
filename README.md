@@ -1,110 +1,92 @@
-# VCIA
+# Version Composition with Independent Auditing (VCIA)
 
-Research code for **Auditing Update Combinations in Decentralized Federated Graph-Level Clustering**. Version Composition with Independent Auditing (VCIA) selects an exact-quota combination of current and stored operator versions, freezes the complete proposed execution state, and applies its registered audit route before committing.
+VCIA selects a fixed-quota combination of current and stored peer records for decentralized federated graph-level clustering. It audits the selected aggregate on independent probes before admission, checking both soft-assignment drift and cluster reassignment probability.
 
-[中文运行说明](docs/运行说明.md) · [Protocol and outputs](docs/protocol.md) · [Numerical studies](legacy/README.md) · [Archived WL pilot](legacy/wl_pilot/README.md)
+![VCIA workflow from local proposals through composition selection and independent auditing](figures/workflow.png)
 
-## Try the decision walkthrough
+## Quick start
 
-Open [the standalone example](examples/admission_walkthrough.html) in a browser after downloading the repository. It shows the two decisions below and lets you expand the input probabilities, individual scores, and all three quota masks. It works offline without Python.
-
-| Scenario | Policy | Proposed current peers | Outcome |
-| --- | --- | --- | --- |
-| Individual changes cancel when combined | VCIA | None | Holds after screening |
-| Individual changes cancel when combined | Unscreened | `[0, 1]` | Commits both after audit |
-| Ranking rules choose different masks | VCIA | `[0, 1]` | Commits both after audit |
-| Ranking rules choose different masks | Drift-First | `[0, 2]` | Holds after audit |
-
-After installation, run `python -m pcoc.demo` to reproduce the decisions in the terminal. Run `python -m pcoc.demo --html examples/admission_walkthrough.html` from the repository root to regenerate the browser view. The example calls the production decision functions with fixed, hand-authored probabilities. No data download or training is required.
-
-`COMMIT` denotes an accepted composition in this walkthrough. The demo does not write peer state or execute distributed commit. Each batch contains one unique hand-authored probe. Repeated inputs illustrate the calculation and do not provide independent-sampling evidence.
-
-## Recompute the abstract comparisons
-
-Run `python reproduction/recompute.py` with Python 3.11 or newer. The script uses the recorded CPU timings and fixed-snapshot decisions in [reproduction/](reproduction/). It requires no external datasets or Python packages.
-
-- In perturbed single-process CPU runs, cumulative online runtime was **4.4% lower on PROTEINS** and **5.9% lower on IMDB-BINARY** than for Unscreened. Each dataset contributes 180 paired rounds with identical executed states and matching cache misses and probe counts.
-- In fixed-snapshot replay under the same IID audit, VCIA yielded **6.6% more operator replacements** than J-Rank (723 vs. 678). Of 324 snapshots, 179 had a design-feasible candidate. The audit passed 130 VCIA proposals and 134 J-Rank proposals.
-
-These are exploratory comparisons. The script recomputes the summaries from the supplied records. The prospective outer WL configurations below are separate studies.
-
-## Install
-
-Use Python 3.11 or newer. The WL pipeline uses CPU and requires no GPU. The Python module and historical policy identifier retain the names `pcoc` and `PCOC` for compatibility.
+Use Python 3.12 for the experiment environment tested with this release. The demo and unit tests run on CPU without data downloads.
 
 ```sh
+git clone https://github.com/PinghanSun/VCIA.git
+cd VCIA
 python -m venv .venv
-# Linux/macOS: . .venv/bin/activate
-# Windows PowerShell: .\.venv\Scripts\Activate.ps1
-python -m pip install -e ".[test]"
 ```
 
-## Inspect a study
+Activate the environment with `source .venv/bin/activate` on Linux/macOS or `.\.venv\Scripts\Activate.ps1` in PowerShell.
 
 ```sh
-python -m pcoc plan --config configs/outer_ranking.json --job 1:6 --list
-python -m pcoc matrix --config configs/robustness.json
+python -m pip install -c experiments/requirements.txt ".[test]"
+python -m pcoc.demo
 python -m pytest
 ```
 
-`plan`, `matrix` without `--output`, and the unit tests use no benchmark data or learner training. `fetch` retrieves TU ZIP files from the upstream host. Existing ZIPs can be copied into `data/` and checked without extraction.
+For a browser walkthrough, download [admission_walkthrough.html](examples/admission_walkthrough.html?raw=1) and open it locally. It illustrates candidate screening, composition ranking, independent auditing, and retaining the stored state when the audit blocks a candidate. Regenerate it with `python -m pcoc.demo --html examples/admission_walkthrough.html`.
+
+## Real-graph experiments
+
+Download [PROTEINS](https://www.chrsmrrs.com/graphkerneldatasets/PROTEINS.zip), [ENZYMES](https://www.chrsmrrs.com/graphkerneldatasets/ENZYMES.zip), and [IMDB-BINARY](https://www.chrsmrrs.com/graphkerneldatasets/IMDB-BINARY.zip) from [TUDataset](https://chrsmrrs.github.io/datasets/docs/datasets/). Place the ZIP archives as downloaded in a `data/` directory at the repository root. The real-graph runners check the archive fingerprints. Use a new output directory for each execution.
+
+### Check the execution paths
+
+The following use only PROTEINS. They exercise the closed-loop learner and the fixed-snapshot replay, respectively, and write sealed outputs to the directories shown.
 
 ```sh
-python -m pcoc fetch --config configs/outer_ranking.json --data-dir data
-python -m pcoc check-data --config configs/outer_ranking.json --data-dir data
+python experiments/run_evidence.py --smoke --data data --output runs/closed-loop-smoke
+python experiments/run_checks.py --smoke --data data --output runs/replay-smoke
 ```
 
-The binary study checks the registered SHA-256 of each archive by default. The transfer suite records the exact SHA-256 of every input. The upstream dataset catalog describes the dataset sources and terms. [TUDataset catalog](https://chrsmrrs.github.io/datasets/docs/datasets/)
+### Run the evaluation protocols
 
-## Run a registered job
-
-Use a new output directory for each study or shard. Omit `--job` for the full plan.
+Run these commands in order. The 60-round closed-loop study uses PROTEINS and ENZYMES. The replay study also includes IMDB-BINARY and reads split and diagnostic inputs from the scored closed-loop study.
 
 ```sh
-python -m pcoc run --execute --config configs/outer_ranking.json --data-dir data --job 1:6 --output runs/ranking-01
-python -m pcoc.analysis summarize --runs runs/ranking-01 --reference Unscreened --output runs/ranking-01-summary.json
+python experiments/run_evidence.py --data data --output runs/closed-loop
+python experiments/score_evidence.py --data data --runs runs/closed-loop
+python experiments/run_checks.py --data data --closed-loop runs/closed-loop --output runs/replay
+python experiments/score_checks.py --data data --closed-loop runs/closed-loop --runs runs/replay
 ```
 
-| Configuration | Question | Planned trajectories |
-| --- | --- | ---: |
-| `outer_ranking.json` | Six ranking rules on the same unscreened, feasible, positive-update family at each frozen pool | 540 |
-| `outer_screening.json` | Individual J veto, with a finite-target census of each available quota mask | 180 |
-| `outer_audit.json` | Sampled VCIA, No-Verify, Census-Audit, Census-Direct, and Simultaneous-family | 450 |
-| `outer_controls.json` | VCIA, J-Rank, Frozen, and the unprotected quota | 360 |
-| `inner_calibration.json` | Inner nominations, full-pool ranking shadows, exact finite-target evidence | 12 |
-| `outer_loopback.json` | Authenticated, journaled, single-host multiprocess TCP version admission | 18 |
-| `outer_transfer.json` | Fixed WL protocol on five datasets with the declared class counts and a new split seed | 900 |
-| `outer_recovery_100.json`, `outer_recovery_300.json` | Optional WL extensions for longer matched clean, stress and recovery schedules | 540 each |
-| `robustness.json` | One-factor sensitivity configurations materialized from the inner base | `pcoc matrix` reports totals |
+The [closed-loop protocol](experiments/evidence_protocol.json) records the split seeds, peer configurations, and probe budgets. The [replay protocol](experiments/replay_protocol.json) defines the matched snapshots and shared audit rules. The replay logs use the historical label `J-Rank` for the comparator whose ranking is restricted to the design-feasible family (J-Rank-Feasible in the paper). Scoring reads sealed predictions and writes CSV summaries in each run directory.
 
-Run `python -m pcoc matrix --config configs/robustness.json --output generated-configs` to materialize the sweep. Keep each sensitivity condition in its own result directory. For sharded runs, put sibling shards under a dedicated parent and pass that parent to the report commands.
+### Run the paired screening benchmark
 
-## Analyze recorded outputs
+Generate the two pilot run banks, then run and score the paired timing benchmark. The benchmark checks the executed state and graph-operator cache misses in each pair. It measures elapsed time on the executing machine within a single process.
 
 ```sh
-python -m pcoc.analysis screening --runs runs/screening --output runs/screening-report.json
-python -m pcoc.analysis calibrate --runs runs/inner --output runs/inner-calibration.json
-python -m pcoc.analysis analytic --output runs/binary-power.json
-python -m pcoc.recovery --runs runs/screening --gap 0.01 --window 3 --output runs/paired-recovery.json
+python experiments/reference/run_pilot.py --dataset data/PROTEINS.zip --out runs/pilots/results_proteins_inner_v1
+python experiments/reference/run_imdb_pilot.py --dataset data/IMDB-BINARY.zip --reference-manifest runs/pilots/results_proteins_inner_v1/manifest.json --out runs/pilots/results_imdb_binary_inner_v1
+python experiments/run_core_gap.py timing --data data --pilot-runs runs/pilots --output runs/core-checks
+python experiments/score_core_gap.py timing --runs runs/core-checks
 ```
 
-`calibrate` replays frozen inner evidence with 10,000 probe batches by default. Register its operating target and any selected route, tolerance, or budget before outer evaluation. The outer JSON files contain starting settings. Calibrate probe budgets separately for the optional 100/300-round extensions. The recovery gap/window in the example are illustrative values to register before outer analysis.
+### Extend the held-out split comparison
 
-## Repository layout
+The additional split study derives eligible conditions from the scored closed-loop run and writes paired NMI and ARI summaries.
 
-```text
-configs/       Registered study definitions and the one-factor grid
-examples/      Offline walkthrough generated by the decision demo
-reproduction/  Records and summary script for the two abstract comparisons
-src/pcoc/      TU/WL learner, admission policies, run ledger, reports, and local TCP protocol
-legacy/        Generated-response studies and archived exploratory WL pilot
-tests/         Small fixtures for policy, analysis, and transaction invariants
-docs/          Provenance, scope, and output documentation
-.github/       Unit and CLI checks for Windows and Linux
+```sh
+python experiments/run_core_gap.py plan --closed-loop runs/closed-loop --output runs/core-checks
+python experiments/run_core_gap.py extend --outer 31504 --data data --output runs/core-checks
+python experiments/run_core_gap.py extend --outer 31505 --data data --output runs/core-checks
+python experiments/run_core_gap.py extend --outer 31506 --data data --output runs/core-checks
+python experiments/score_core_gap.py quality --data data --closed-loop runs/closed-loop --runs runs/core-checks
 ```
 
-The historical 20-round and 60-round studies use generated responses. Their method names are response-profile labels. The WL pilot is a separate graph-learning study. The prospective outer WL configurations have no recorded results. See the protocol notes for the outstanding extensions.
+## Generated stress tests
+
+The generated-response experiments cover accuracy trajectories, recovery, and parameter sensitivity. They use seeded synthetic probabilities and require no graph data. See the [experiment notes](legacy/README.md) for the design and output schema.
+
+```sh
+python -m legacy main20 --output runs/numerical20
+python -m legacy supplement20 --main runs/numerical20 --output runs/numerical-supplement
+python -m legacy followup60 --main runs/numerical20 --output runs/numerical60
+```
+
+## Paper figures
+
+[Motivation](figures/motivation.pdf) · [VCIA workflow](figures/workflow.pdf) · [Stress-test trajectories and recovery](figures/stress-test.pdf) · [Sensitivity](figures/sensitivity.pdf)
 
 ## Citation
 
-See [CITATION.cff](CITATION.cff). The current metadata follows the anonymized manuscript.
+Use [CITATION.cff](CITATION.cff) to cite the code artifact.
