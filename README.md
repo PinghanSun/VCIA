@@ -6,7 +6,7 @@ VCIA selects a fixed-quota combination of current and stored peer records for de
 
 ## Quick start
 
-Use Python 3.12 for the experiment environment tested with this release. The demo and unit tests run on CPU without data downloads.
+Use Python 3.12 for the experiment environment tested with this release. The demo and unit tests run on CPU.
 
 ```sh
 git clone https://github.com/PinghanSun/VCIA.git
@@ -75,7 +75,7 @@ python experiments/score_core_gap.py quality --data data --closed-loop runs/clos
 
 ## Generated stress tests
 
-The generated-response experiments cover accuracy trajectories, recovery, and parameter sensitivity. They use seeded synthetic probabilities and require no graph data. See the [experiment notes](legacy/README.md) for the design and output schema.
+The generated-response experiments cover accuracy trajectories, recovery, and parameter sensitivity. See the [experiment notes](legacy/README.md) for the design and output schema.
 
 ```sh
 python -m legacy main20 --output runs/numerical20
