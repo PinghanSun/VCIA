@@ -1,6 +1,7 @@
 """Build the experimental figures from the numeric publication inputs."""
 
 import json
+from argparse import ArgumentParser
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -10,7 +11,6 @@ from matplotlib.ticker import PercentFormatter
 
 HERE = Path(__file__).resolve().parent
 FIGURES = HERE.parent / "runs" / "figures"
-DATA = json.loads((HERE / "closed_loop_nci1_plot_data.json").read_text(encoding="utf-8"))
 SERIF = {font.name for font in font_manager.fontManager.ttflist}
 plt.rcParams.update({
     "font.family": "serif",
@@ -30,7 +30,7 @@ ORANGE = "#a65227"
 GREEN = "#347b68"
 
 
-def draw_closed_loop():
+def draw_closed_loop(data):
     fig, axes = plt.subplots(1, 2, figsize=(5.3, 2.19), sharey=True)
     contrasts = ["No-Composition", "Reassignment only", "Drop both", "J-Rank-Feasible"]
     datasets = {"PROTEINS": (BLUE, "o", 0.13), "ENZYMES": (ORANGE, "s", -0.13)}
@@ -40,7 +40,7 @@ def draw_closed_loop():
         axis.axvline(0, color="0.55", lw=0.8, ls="--", zorder=0)
         for row, contrast in enumerate(contrasts[::-1]):
             for dataset, (color, marker, offset) in datasets.items():
-                values = DATA["closed_loop"][contrast][dataset][metric]
+                values = data["closed_loop"][contrast][dataset][metric]
                 axis.scatter(values, [row + offset] * len(values), s=18, c=color, marker=marker,
                              alpha=0.76, linewidths=0, label=dataset if row == 0 else None)
         axis.set_yticks(range(4), contrasts[::-1])
@@ -58,16 +58,16 @@ def draw_closed_loop():
     plt.close(fig)
 
 
-def draw_nci1():
+def draw_nci1(data):
     fig, (time_ax, yield_ax) = plt.subplots(1, 2, figsize=(5.3, 2.4))
-    sizes = DATA["nci1"]["sizes"]
+    sizes = data["nci1"]["sizes"]
     x = range(len(sizes))
     for method, color in [("IID 2048", BLUE), ("IID 8192", ORANGE)]:
         for cache, cache_label, marker, line in [("Cold", "cold", "o", "--"), ("Design-warm", "cached", "s", "-")]:
-            series = DATA["nci1"][cache][method]
+            series = data["nci1"][cache][method]
             time_ax.plot(x, series["time"], color=color, marker=marker, lw=1, ls=line, ms=4,
                          label=f"{int(method[4:]):,} · {cache_label}")
-        yield_ax.plot(x, DATA["nci1"]["Design-warm"][method]["yield"], color=color,
+        yield_ax.plot(x, data["nci1"]["Design-warm"][method]["yield"], color=color,
                       marker="o", lw=1.15, ms=4, label=f"{int(method[4:]):,} draws")
     yield_ax.plot(x, [1] * len(sizes), color=GREEN, marker="D", lw=1.1, ms=3.5, label="Census")
     time_ax.axhline(0, color="0.55", lw=0.75)
@@ -91,6 +91,13 @@ def draw_nci1():
 
 
 if __name__ == "__main__":
+    parser = ArgumentParser(description=__doc__)
+    parser.add_argument("--input", type=Path, default=HERE / "closed_loop_nci1_plot_data.json",
+                        help="Path to the closed-loop and NCI1 plot JSON")
+    args = parser.parse_args()
+    if not args.input.is_file():
+        parser.error(f"Plot JSON missing: {args.input}. Supply it with --input.")
+    data = json.loads(args.input.read_text(encoding="utf-8"))
     FIGURES.mkdir(parents=True, exist_ok=True)
-    draw_closed_loop()
-    draw_nci1()
+    draw_closed_loop(data)
+    draw_nci1(data)

@@ -1,9 +1,8 @@
-"""Render main Fig. 3 from the bundled response model results.
-
-Run with Python and Matplotlib: python figure_source/draw_experiment_3x3.py
+"""Render main Fig. 3 from response-model CSV inputs.
 The CSV key PCOC is the archived identifier of the VCIA policy profile.
 """
 
+from argparse import ArgumentParser
 from collections import defaultdict
 from csv import DictReader
 from pathlib import Path
@@ -41,14 +40,14 @@ TICK_COLOR = "#202b38"
 GRID = "#e4e9ef"
 
 
-def read_csv(name):
-    with (DATA / name).open(encoding="utf-8-sig", newline="") as source:
+def read_csv(path):
+    with path.open(encoding="utf-8-sig", newline="") as source:
         return list(DictReader(source))
 
 
-def load_trajectories():
+def load_trajectories(input_dir):
     curves = defaultdict(list)
-    for row in read_csv("trajectories.csv"):
+    for row in read_csv(input_dir / "trajectories.csv"):
         assert row["attack"] == "A3"
         curves[row["dataset"], row["method"]].append(
             (int(row["round"]), float(row["mean_ACC_pct"]), float(row["SD_ACC_pct"]))
@@ -60,9 +59,9 @@ def load_trajectories():
     return curves
 
 
-def load_intervals(name, series, key, estimate, low, high, *, severity=None):
+def load_intervals(path, series, key, estimate, low, high, *, severity=None):
     by_key = {}
-    for row in read_csv(name):
+    for row in read_csv(path):
         if severity is not None and row["attack"] != severity:
             continue
         pair = row["dataset"], row[key]
@@ -136,8 +135,8 @@ def forest(ax, values, keys, names, colors, markers, limits, ticks, label):
     panel_key(ax, handles)
 
 
-def recovery(ax):
-    rows = {r["method"]: r for r in read_csv("recovery.csv")}
+def recovery(ax, input_dir):
+    rows = {r["method"]: r for r in read_csv(input_dir / "recovery.csv")}
     methods = (*POLICIES, "NoVerify")
     assert set(rows) == set(methods)
     statuses = ("not_disrupted", "recovered", "censored_at60")
@@ -207,7 +206,7 @@ def verify_bounds(fig, axes, captions, legend):
         assert not any(box.overlaps(other) for other in count_boxes[i + 1:] + tick_boxes), box
 
 
-def main():
+def main(input_dir):
     plt.rcParams.update({
         "font.family": "Times New Roman", "font.size": 7.4, "pdf.fonttype": 42,
         "axes.linewidth": .48, "axes.edgecolor": "#778593", "axes.labelcolor": INK,
@@ -221,14 +220,14 @@ def main():
     fig = plt.figure(figsize=(WIDTH / 72, HEIGHT / 72), dpi=144)
     axes = [fig.add_axes([x / WIDTH, y / HEIGHT, PANEL_WIDTH / WIDTH, PANEL_HEIGHT / HEIGHT])
             for y in Y for x in X]
-    curves = load_trajectories()
+    curves = load_trajectories(input_dir)
     for index, axis in enumerate(axes[:5]):
         trajectory(axis, index, curves)
-    policy = load_intervals("policy_contrasts.csv", POLICIES[1:], "comparator", "delta_ACC_pct",
+    policy = load_intervals(input_dir / "policy_contrasts.csv", POLICIES[1:], "comparator", "delta_ACC_pct",
                             "ACC_CI95_low", "ACC_CI95_high", severity="A3")
-    mechanism = load_intervals("mechanism_contrasts.csv", VARIANTS, "comparator", "delta_ACC_pct",
+    mechanism = load_intervals(input_dir / "mechanism_contrasts.csv", VARIANTS, "comparator", "delta_ACC_pct",
                                "ACC_CI95_low", "ACC_CI95_high", severity="A3")
-    interaction = load_intervals("gx_interactions.csv", SEVERITIES, "attack", "interaction_pp",
+    interaction = load_intervals(input_dir / "gx_interactions.csv", SEVERITIES, "attack", "interaction_pp",
                                  "CI95_low", "CI95_high")
     forest(axes[5], policy, POLICIES[1:], POLICY_NAMES[1:],
            POLICY_COLOR[1:], ("s", "^", "D"), (-5.7, 12.4), [-5, 0, 5, 10], "ΔACC (pp)")
@@ -236,7 +235,7 @@ def main():
            ("s", "^", "D"), (-5.5, 6.5), [-4, 0, 4], "ΔACC (pp)")
     forest(axes[7], interaction, SEVERITIES, PERTURBATION_MULTIPLIERS, ("#718397", "#4b94ba", "#346da7", "#343c70"),
            ("o", "s", "^", "D"), (-15.8, 12.5), [-15, -10, -5, 0, 5, 10], "Interaction (pp)")
-    recovery(axes[8])
+    recovery(axes[8], input_dir)
     captions = []
     for i, title in enumerate((*DATASETS, "Policy contrasts", "Mechanism variants",
                                "G/X interaction", "Status at round 60")):
@@ -258,4 +257,12 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    parser = ArgumentParser(description=__doc__)
+    parser.add_argument("--input-dir", type=Path, default=DATA, help="Directory containing the five plot CSVs")
+    args = parser.parse_args()
+    required = ("trajectories.csv", "policy_contrasts.csv", "mechanism_contrasts.csv",
+                "gx_interactions.csv", "recovery.csv")
+    missing = [name for name in required if not (args.input_dir / name).is_file()]
+    if missing:
+        parser.error(f"Missing plot inputs in {args.input_dir}: {', '.join(missing)}. Use --input-dir.")
+    main(args.input_dir)

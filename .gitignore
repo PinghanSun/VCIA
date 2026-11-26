@@ -11,3 +11,9 @@ __pycache__/
 .coverage
 .DS_Store
 *.part
+
+/configs/mmfd_splits.json
+/figure_source/experiment_3x3/
+/figure_source/Sensitivity_Delta_ACC.csv
+/figure_source/closed_loop_nci1_plot_data.json
+/figures/

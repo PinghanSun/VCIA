@@ -144,8 +144,8 @@ def compare_rounds(rows, reference):
     print(f"Matched {len(rows)} round decisions and state fingerprints.")
 
 
-def run(output, data, smoke, reference):
-    frozen = json.loads(SPLITS.read_text(encoding="utf-8"))
+def run(output, data, smoke, reference, splits=SPLITS):
+    frozen = json.loads(splits.read_text(encoding="utf-8"))
     old.DATA = data
     rounds, index, predictions, truth = [], [], {}, {}
     rounds_per_trajectory = 12 if smoke else 60
@@ -200,7 +200,7 @@ def run(output, data, smoke, reference):
 
     output.mkdir(parents=True, exist_ok=False)
     base.write_json(output / "protocol.json", dict(smoke=smoke, rounds=rounds_per_trajectory,
-                    splits_sha256=base.digest(SPLITS), datasets_sha256=dataset_hashes,
+                    splits_sha256=base.digest(splits), datasets_sha256=dataset_hashes,
                     audit_draws_per_nominee=8192, design_draws=512, blas_threads=1))
     write_rows(output / "rounds.csv", rounds)
     base.write_json(output / "index.json", index)
@@ -221,8 +221,11 @@ if __name__ == "__main__":
     parser = ArgumentParser(description=__doc__)
     parser.add_argument("--data", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--splits", type=Path, default=SPLITS, help="Path to the frozen graph split file")
     parser.add_argument("--smoke", action="store_true")
     parser.add_argument("--reference", type=Path, help="Optional archived mmfd_composition_rounds.csv")
     args = parser.parse_args()
+    if not args.splits.is_file():
+        parser.error(f"Frozen split file missing: {args.splits}. Supply it with --splits.")
     with threadpool_limits(limits=1):
-        run(args.output, args.data, args.smoke, args.reference)
+        run(args.output, args.data, args.smoke, args.reference, args.splits)

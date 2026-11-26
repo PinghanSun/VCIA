@@ -21,6 +21,8 @@ python -m pcoc.demo
 python -m pytest -q
 ```
 
+The demo and tests require only the source release and its Python dependencies.
+
 ## Run a quick graph experiment
 
 Download [PROTEINS.zip](https://www.chrsmrrs.com/graphkerneldatasets/PROTEINS.zip) into `data/` and leave it zipped. Run the command below from the repository root. Use a new output directory each time.
@@ -31,7 +33,7 @@ python experiments/run_closed_ablation.py --smoke --data data --output runs/clos
 
 ## Run the paper experiments
 
-Follow the [input and experiment commands](REPRODUCTION.md#inputs) for dataset downloads, closed-loop ablations, snapshot replay, audit-budget checks, timing, and figure rendering.
+Use the [input and experiment commands](REPRODUCTION.md#inputs) for each run. Supply datasets, frozen splits, and plotting inputs separately when a command calls for them.
 
 ### Jetson Linux
 

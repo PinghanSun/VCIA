@@ -1,10 +1,7 @@
-"""Draw main Fig. 4 from the bundled round-20 response model results.
-
-Run with Python and Matplotlib: python figure_source/draw_sensitivity.py
-The input is the one-factor export reconciled with the workbook's
-original V15 conditions worksheet. The effect is in percentage points.
+"""Draw main Fig. 4 from a round-20 response-model CSV. Effects are in percentage points.
 """
 
+from argparse import ArgumentParser
 from collections import defaultdict
 from csv import DictReader
 from math import isclose
@@ -49,11 +46,11 @@ TICK_COLOR = "#202b38"
 OUTLINE = "#68788a"
 
 
-def load_panels():
+def load_panels(input_path):
     effects = {}
     levels = defaultdict(set)
     defaults = defaultdict(set)
-    with (HERE / "Sensitivity_Delta_ACC.csv").open(encoding="utf-8-sig", newline="") as source:
+    with input_path.open(encoding="utf-8-sig", newline="") as source:
         for row in DictReader(source):
             factor, dataset = row["parameter"], row["dataset"]
             level = float(row["value"])
@@ -214,5 +211,11 @@ def draw(panels):
 
 
 if __name__ == "__main__":
-    draw(load_panels())
+    parser = ArgumentParser(description=__doc__)
+    parser.add_argument("--input", type=Path, default=HERE / "Sensitivity_Delta_ACC.csv",
+                        help="Path to the one-factor sensitivity CSV")
+    args = parser.parse_args()
+    if not args.input.is_file():
+        parser.error(f"Plot CSV missing: {args.input}. Supply it with --input.")
+    draw(load_panels(args.input))
     print("130 centered labels, 7 panels, and the shared vertical color scale verified.")

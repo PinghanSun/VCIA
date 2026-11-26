@@ -1,6 +1,6 @@
 # Reproduction guide
 
-Run commands from the directory containing `README.md` with the [Jetson Linux environment](README.md#jetson-linux) active. Give each rerun a new output directory. The single-process real-graph runners perform local learning and admission. Any loopback traffic and timing are scoped to the process and host running the command.
+Run commands from the directory containing `README.md` with the [Python environment](README.md#set-up-the-environment) active. Give each rerun a new output directory. The single-process real-graph runners perform local learning and admission. Any loopback traffic and timing are scoped to the process and host running the command.
 
 ## Jetson run environment
 
@@ -41,6 +41,8 @@ Create a `data/` directory next to README.md. Save the [TUDataset](https://chrsm
 | [IMDB-BINARY.zip](https://www.chrsmrrs.com/graphkerneldatasets/IMDB-BINARY.zip) | `b291ec8b26d85c70faa2ba0a2433e1f407ed2ef5d0fc072d36b9a95e49a1bb27` |
 | [NCI1.zip](https://www.chrsmrrs.com/graphkerneldatasets/NCI1.zip) | `10e1458f3bd9224f14e6d7627e74dcfd13e48d376d73935e7bd2900590ef1d82` |
 
+Supply the frozen cohort split JSON separately for MMFD. The graph runners listed here fit their operators from graph inputs. See the figure commands below for the required CSV and JSON exports.
+
 ## Paper-to-code map
 
 | Result | Entry point | Evidence and outputs |
@@ -50,23 +52,27 @@ Create a `data/` directory next to README.md. Save the [TUDataset](https://chrsm
 | Main Table 2, original 60-round closed loop | `run_evidence.py` and `score_evidence.py` | Per-round admission, replacement totals, state fingerprints and held-out NMI/ARI |
 | Main Table 1 and supplement Table S21, closed-loop component ablations | `run_closed_ablation.py` | 216 trajectories, `rounds.csv`, sealed predictions and per-split NMI/ARI |
 | Supplement Table S22 and Fig. S2, NCI1 audit cost and feasible admission | `run_nci1_audits.py` | Scheduled snapshots, candidate decisions, audit timings and nested probe pools |
-| Main §4 and supplement Tables S17–S18, scalar MMFD composition ablation | `run_mmfd_ablation.py` | 36 paired trajectories per arm, frozen graph splits, committed replacements and audit draws |
+| Main §4 and supplement Tables S17–S18, scalar MMFD composition ablation | `run_mmfd_ablation.py` | 36 matched trajectory pairs, frozen graph splits, committed replacements and audit draws |
 | Supplement Tables S15–S16 and S19–S20, audit-budget and probe-reuse checks | `run_vcia_budget_32768.py` and `run_vcia_near_threshold.py` | Closed-loop budget comparisons, paired estimates for reused and fresh probes, and near-threshold replay |
 | Main Figs. 3–4 and supplement §§C–D, response-model stress tests | `python -m legacy` | Seeded generated probability trajectories, endpoint metrics, sensitivity and recovery |
-| Main Figs. 3–4 and supplement Figs. S1–S2 | Scripts in `figure_source/` | Render the evaluation figures using the inputs packaged in this directory |
+| Main Figs. 3–4 and supplement Figs. S1–S2 | Scripts in `figure_source/` | Render the evaluation figures from externally supplied CSV or JSON inputs |
 
 `J-Rank` in fixed-snapshot replay files is the historical key for **J-Rank-Feasible**. The main comparison uses the same audit rule and totals prospective replacements over each policy's own passing snapshots. The replay summary also reports totals on snapshots passed by both policies. The response-model studies use their own generated J-Rank policy profile.
 
 ## Verify archived results
 
-Place `VCIA_Verification_Records.zip` beside the extracted code directory. The commands below extract it, verify the archived files against `SHA256SUMS.txt`, and recalculate timing summaries, snapshot replay, audit-budget and probe-reuse results, component ablations, and NCI1 audit results. The records archive includes the scripts for these checks.
+If you have a separate copy of `VCIA_Verification_Records.zip`, place it beside the source directory. The commands below extract it, verify `SHA256SUMS.txt`, and recalculate the timing, snapshot replay, audit, component ablation, and NCI1 summaries.
 
 ```sh
 python -m zipfile -e ../VCIA_Verification_Records.zip ..
-python ../VCIA_Verification_Records/tools/verify_records.py --records ../VCIA_Verification_Records --score-predictions
+python tools/verify_records.py --records ../VCIA_Verification_Records --score-predictions
 ```
 
-The optional `--score-predictions` flag recalculates NMI and ARI from the saved held-out predictions.
+The optional `--score-predictions` flag recalculates NMI and ARI from the saved held-out predictions. To summarize the archived ranking comparison, run:
+
+```sh
+python tools/summarize_ranking.py --input ../VCIA_Verification_Records/supplement/data/ranking_replay.csv --output runs/ranking-summary.csv
+```
 
 ## Calibrate the reassignment check
 
@@ -76,13 +82,13 @@ Run `python tools/verification_calibration.py --output-dir runs/calibration` to 
 
 ### Smoke tests
 
-The first three commands use PROTEINS. The MMFD check uses PROTEINS and IMDB-BINARY. The final command uses NCI1.
+The first three commands use PROTEINS. The MMFD check uses PROTEINS, IMDB-BINARY, and the external frozen split file. The final command uses NCI1.
 
 ```sh
 python experiments/run_evidence.py --smoke --data data --output runs/closed-loop-smoke
 python experiments/run_checks.py --smoke --data data --output runs/replay-smoke
 python experiments/run_closed_ablation.py --smoke --data data --output runs/closed-ablation-smoke
-python experiments/run_mmfd_ablation.py --smoke --data data --output runs/mmfd-smoke
+python experiments/run_mmfd_ablation.py --smoke --data data --splits data/mmfd_splits.json --output runs/mmfd-smoke
 python experiments/run_nci1_audits.py --smoke --data data/NCI1.zip --output runs/nci1-smoke
 ```
 
@@ -134,11 +140,11 @@ The expanded closed-loop study uses two initializations for each outer split, si
 
 ```sh
 python experiments/run_closed_ablation.py --data data --workers 4 --output runs/closed-ablation
-python experiments/run_mmfd_ablation.py --data data --output runs/mmfd
+python experiments/run_mmfd_ablation.py --data data --splits data/mmfd_splits.json --output runs/mmfd
 python experiments/run_nci1_audits.py --data data/NCI1.zip --output runs/nci1
 ```
 
-The MMFD runner uses the frozen cohort splits in `configs/mmfd_splits.json`. Each runner writes fresh audit decisions and counters. NCI1 also writes individual timing repeats with the executing host recorded in `execution.json`.
+Pass the frozen cohort splits to the MMFD runner with `--splits`. Each runner writes fresh audit decisions and counters. NCI1 also writes individual timing repeats with the executing host recorded in `execution.json`.
 
 ### Check Table 1 and the abstract's ablation results
 
@@ -162,15 +168,15 @@ python -m legacy followup60 --main runs/numerical20 --output runs/numerical60
 
 ## Render the evaluation figures
 
-Run the renderers from the extracted code directory. Their CSV and JSON inputs are included in `figure_source/`.
+Run the renderers from the extracted code directory. Supply the five Fig. 3 CSVs in `data/plots/experiment_3x3/`: `trajectories.csv`, `policy_contrasts.csv`, `mechanism_contrasts.csv`, `gx_interactions.csv`, and `recovery.csv`. Place the Fig. 4 sensitivity CSV and the supplementary plot JSON in `data/plots/`.
 
 ```sh
 python -m pip install -c experiments/requirements.txt -r figure_source/requirements.txt
-python figure_source/draw_experiment_3x3.py
-python figure_source/draw_sensitivity.py
-python figure_source/draw_closed_loop_nci1.py
+python figure_source/draw_experiment_3x3.py --input-dir data/plots/experiment_3x3
+python figure_source/draw_sensitivity.py --input data/plots/Sensitivity_Delta_ACC.csv
+python figure_source/draw_closed_loop_nci1.py --input data/plots/closed_loop_nci1_plot_data.json
 ```
 
 The renderers write four PDFs to `runs/figures/`. System fonts and PDF metadata may differ on rerendering.
 
-If you have the original expanded closed-loop and NCI1 experiment workbook, `python figure_source/extract_closed_loop_nci1.py path/to/workbook.xlsx` rechecks the workbook and exports two tables and the plot data to `runs/workbook-export/`. This optional command requires openpyxl.
+If you have the original expanded closed-loop and NCI1 experiment workbook, `python figure_source/extract_closed_loop_nci1.py path/to/workbook.xlsx` rechecks the workbook and exports two tables and the plot data to `runs/workbook-export/`. This optional command requires openpyxl. Pass the resulting `runs/workbook-export/closed_loop_nci1_plot_data.json` to the third renderer.
