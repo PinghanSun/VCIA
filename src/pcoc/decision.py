@@ -320,6 +320,7 @@ def design(
         raise ValueError("a full-family ranker requires full enumeration")
     capped_ages = np.minimum(ages, config.age_cap)
 
+    # Compare each peer's two versions with the other offered versions fixed.
     screen_start = perf_counter()
     offered = tuple(i for i in peer_ids if available[i])
     all_current = (
@@ -507,6 +508,7 @@ def verify(
         pool, selected, baseline, baseline.argmax(axis=-1), counts
     )
     ell, variance = _moments(distances, counts, draws)
+    # The two one-sided bounds share the round's audit error budget.
     alpha = config.delta_verify / 2
     upper_ell = empirical_bernstein_upper(ell, variance, pool.range, draws, alpha)
     upper_phi = clopper_pearson_upper(flips, draws, alpha)

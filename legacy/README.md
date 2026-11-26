@@ -17,9 +17,9 @@ Use a new output directory for each command. The follow-up checks the first 20 l
 
 | Command | Design | Output |
 | --- | --- | --- |
-| `main20` | Five scenarios, 27 profiles, four severities, three partitions, five initializations, 20 rounds | 8,100 trajectories and 162,000 points, condition means and descriptive SDs, paired contrasts, latent recovery, probability examples, and analytic cost estimates |
-| `supplement20` | 210 sensitivity settings, 200 learning-label settings, and 100 new mechanism controls | 7,650 new trajectories and 153,000 points, 120 separately labeled main conditions reused in summaries, G/X factorial interactions, and analytic resource and topology estimates |
-| `followup60` | Five scenarios, 27 profiles, 15 nested outcomes, and seven branches per profile and scenario | 14,175 trajectories and 850,500 points, primary and sensitivity recovery decisions, grouped counts, and matched probability examples |
+| `main20` | Five scenarios, 27 profiles, four severities, three partitions, five initializations, 20 rounds | Trajectories, condition means and descriptive SDs, paired contrasts, latent recovery, probability examples, and analytic cost estimates |
+| `supplement20` | 210 sensitivity settings, 200 learning-label settings, and 100 new mechanism controls | Trajectories, summaries with labeled main conditions, G/X factorial interactions, and analytic resource and topology estimates |
+| `followup60` | Five scenarios, 27 profiles, 15 nested outcomes, and seven branches per profile and scenario | Trajectories, primary and sensitivity recovery decisions, grouped counts, and matched probability examples |
 
 ## Read the outputs
 
@@ -27,8 +27,8 @@ Use a new output directory for each command. The follow-up checks the first 20 l
 - The statistics archives contain `metadata`, `confusion`, `class_nll_sums`, `metrics`, and `latent`. Main metadata columns are profile index, severity index, partition, and initialization. Supplement metadata columns are one-based condition ID, partition, and initialization. Follow-up metadata columns are profile index, branch code, severity index, partition, and initialization. Profile and severity indices are zero-based and follow `profiles.json`. Follow-up branch codes are clean 0, stop 1, and continuous 2.
 - The primary endpoint is round 20, with rounds 16–20 as the secondary endpoint. PCOC-minus-comparator intervals average the five paired initializations within each partition and apply a pointwise Student-(t) interval across three partition means. A smaller evaluation NLL indicates lower loss. Condition-level SDs describe the 15 nested outcomes.
 - Recovery uses the contemporaneous clean branch and a mean paired loss greater than 1 point in rounds 9–12 to define disruption. The main follow-up threshold is a gap at most 0.5 points for three contiguous post-stop rounds. Latent gaps are absolute and ACC gaps are clipped below at zero. A continuous-attack branch can cross a threshold while exposure remains active. Its post-stop recovery fields stay empty.
-- The analytic cost outputs use a two-layer GCN64 proxy with explicit workload and throughput assumptions. The 4 MB per message topology model covers communication only. Fields for actual epochs, GPU seconds, and peak GPU bytes are empty.
-- `provenance.json` records SHA-256 fingerprints for the archived author scripts and input configuration used in this port. The historical workbooks, presentation figures, and screenshots of other papers remain in the author archive. The portable code exports the underlying numerical statistics as CSV and NPZ.
+- The analytic cost outputs use a two-layer GCN64 proxy with explicit workload and throughput assumptions. The 4 MB per message topology model estimates communication costs. Hardware measurement fields are reserved for measured runs.
+- `provenance.json` records SHA-256 fingerprints for the source scripts and input configuration used in this port. The portable code exports the generated statistics as CSV and NPZ.
 
 ## Check a reproduction against the original arrays
 

@@ -207,13 +207,13 @@ def main(argv=None):
     )
     print("HOLD retains all stored versions.")
     print(
-        "COMMIT denotes an accepted composition. This demo does not write peer state or execute distributed commit."
+        "COMMIT denotes acceptance in this in-memory walkthrough."
     )
     print(
-        "Each batch has one unique hand-authored probe. Repetition illustrates the calculation, not independent-sampling evidence."
+        "Each batch repeats one probe to illustrate the calculation. The statistical guarantee requires independent draws."
     )
     print(
-        "The probe streams were chosen for illustration. The walkthrough uses no training or benchmark data."
+        "The walkthrough uses hand-authored probe inputs."
     )
     for title, summary, tables in sections:
         print(f"\n{title}\n{summary}")

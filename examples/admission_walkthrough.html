@@ -7,103 +7,155 @@
   <style>
     :root {
       color-scheme: light;
-      --page: #f4f6fa;
+      --paper: #f5f5f0;
       --surface: #fff;
-      --ink: #1d263b;
-      --muted: #4d5c73;
-      --border: #d6deea;
-      --tint: #eef2f8;
-      --accent: #345ba3;
-      --focus: #3263be;
+      --ink: #192c33;
+      --muted: #486068;
+      --line: #d1dbd8;
+      --tint: #edf3f0;
+      --accent: #245e57;
+      --focus: #166c81;
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
       color: var(--ink);
-      background: var(--page);
+      background: var(--paper);
       font: 16px/1.55 system-ui, "Segoe UI", sans-serif;
     }
-    main { width: min(100%, 84rem); margin-inline: auto; padding: clamp(1rem, 4vw, 3rem); }
-    .intro { max-width: 49rem; margin-bottom: 2rem; }
-    h1, h2 { margin: 0; line-height: 1.12; text-wrap: balance; }
-    h1 { font-size: clamp(2.15rem, 5vw, 3.65rem); letter-spacing: -.04em; }
-    h2 { font-size: clamp(1.35rem, 2.5vw, 2rem); letter-spacing: -.025em; }
-    p { margin-block: .65rem 0; color: var(--muted); }
-    .scope {
-      padding: .7rem .9rem;
-      border-left: 3px solid var(--accent);
-      background: var(--tint);
+    button { font: inherit; }
+    :focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+    [hidden] { display: none !important; }
+    main { width: min(100%, 74rem); margin-inline: auto; padding: 0 clamp(1rem, 4vw, 3rem) 3rem; }
+    h1, h2, h3 { margin: 0; line-height: 1.15; }
+    h1, h2 { font-family: Georgia, "Times New Roman", serif; letter-spacing: -.025em; text-wrap: balance; }
+    h1 { font-size: clamp(2.3rem, 5vw, 4rem); }
+    h2 { font-size: clamp(1.65rem, 3.2vw, 2.5rem); }
+    h3 { font-size: 1.08rem; }
+    p { margin: .55rem 0 0; color: var(--muted); }
+    .intro {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 15rem);
+      align-items: center;
+      gap: 1.5rem;
+      padding-block: clamp(1.25rem, 4vw, 2.75rem);
     }
-    article {
-      margin-block: 1rem;
-      padding: clamp(.9rem, 2.5vw, 1.65rem);
-      border: 1px solid var(--border);
-      border-radius: .7rem;
+    .intro p { max-width: 46rem; }
+    .setup { margin: 0; padding: .85rem 1rem; background: var(--tint); border-left: 3px solid var(--accent); }
+    .setup div { display: flex; justify-content: space-between; gap: 1rem; }
+    .setup div + div { margin-top: .25rem; }
+    .setup dt { color: var(--muted); font-size: .86rem; }
+    .setup dd { margin: 0; font-size: .86rem; font-weight: 750; font-variant-numeric: tabular-nums; }
+    .case-nav { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: .8rem; }
+    .case-nav button {
+      padding: .45rem .85rem;
+      color: var(--accent);
       background: var(--surface);
-    }
-    .table-region {
-      max-width: 100%;
-      overflow-x: auto;
-      margin-block: 1rem;
-      border: 1px solid var(--border);
-      border-radius: .4rem;
-    }
-    .table-region:focus-visible, summary:focus-visible {
-      outline: 2px solid var(--focus);
-      outline-offset: 3px;
-    }
-    table { width: 100%; border-collapse: collapse; font-size: .9rem; }
-    caption {
-      padding: .65rem .75rem;
-      text-align: left;
-      color: var(--ink);
-      font-size: 1rem;
-      font-weight: 700;
-    }
-    th, td { padding: .45rem .75rem; text-align: left; vertical-align: top; }
-    th { color: var(--ink); background: var(--tint); font-weight: 650; }
-    td { border-top: 1px solid var(--border); font-variant-numeric: tabular-nums; }
-    tr:nth-child(even) td { background: #f8faff; }
-    .status {
-      display: inline-block;
-      padding: .12rem .44rem;
+      border: 1px solid var(--line);
       border-radius: .3rem;
-      white-space: nowrap;
-      font-size: .8rem;
-      font-weight: 750;
+      font-size: .88rem;
+      font-weight: 700;
+      text-align: left;
+      cursor: pointer;
     }
-    .commit { color: #0d5c39; background: #e1f3e9; }
-    .hold { color: #73490d; background: #fff0d6; }
-    details { border-top: 1px solid var(--border); }
-    summary { cursor: pointer; padding: .62rem .2rem; font-weight: 650; }
+    .case-nav button:hover { border-color: var(--accent); }
+    .case-nav button[aria-pressed="true"] { color: #fff; background: var(--accent); border-color: var(--accent); }
+    article {
+      padding: clamp(1rem, 3vw, 1.85rem);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-top: 3px solid var(--accent);
+      border-radius: .55rem;
+    }
+    article + article { margin-top: 1rem; }
+    .case-summary { max-width: 53rem; }
+    .limits { margin: 1.15rem 0 .5rem; color: var(--ink); font-size: .86rem; font-weight: 650; }
+    .outcomes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; margin-bottom: 1.1rem; }
+    .outcome { min-width: 0; padding: .8rem .9rem; border: 1px solid var(--line); border-radius: .4rem; }
+    .outcome header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .4rem; }
+    .outcome p { margin-top: .38rem; font-size: .84rem; }
+    .status { padding: .1rem .42rem; border-radius: .2rem; font-size: .75rem; font-weight: 800; letter-spacing: .025em; }
+    .commit { color: #13563b; background: #ddefe4; }
+    .hold { color: #70470f; background: #f9ebd2; }
+    .values {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: .45rem .75rem;
+      margin: .65rem 0 0;
+      padding-top: .55rem;
+      border-top: 1px solid var(--line);
+    }
+    .values dt { color: var(--muted); font-size: .76rem; }
+    .values dd { margin: 0; font-size: .91rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    details { border-top: 1px solid var(--line); }
+    summary { cursor: pointer; padding: .62rem .1rem; font-size: .9rem; font-weight: 700; }
     summary::marker { color: var(--accent); }
-    .row-count { color: var(--muted); margin-inline-start: .55rem; font-size: .83rem; font-weight: 450; }
-    details .table-region { margin-block: .15rem .8rem; }
-    @media (max-width: 35rem) {
-      th, td { padding-inline: .55rem; }
+    .table-region { max-width: 100%; overflow-x: auto; margin-bottom: .8rem; border: 1px solid var(--line); border-radius: .3rem; }
+    table { width: 100%; min-width: 32rem; border-collapse: collapse; font-size: .84rem; }
+    caption { padding: .55rem .65rem; color: var(--muted); text-align: left; font-weight: 650; }
+    th, td { padding: .42rem .65rem; text-align: left; vertical-align: top; }
+    thead th { background: var(--tint); }
+    tbody th, td { border-top: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+    tr:nth-child(even) { background: #f6f9f7; }
+    .scope { max-width: 57rem; padding-top: .4rem; font-size: .85rem; }
+    @media (max-width: 46rem) {
+      .intro { grid-template-columns: 1fr; gap: .85rem; }
+      .setup { max-width: 25rem; }
+    }
+    @media (max-width: 36rem) {
+      .outcomes { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
 <main>
   <header class="intro">
-    <h1>VCIA decision walkthrough</h1>
-    <p>Fixed, hand-authored cluster probabilities illustrate how the design probe batch guides selection and how a separate verification batch checks the selected composition.</p>
-    <p>Each proposal chooses two of three peers to use current versions. The other peer keeps its stored version. HOLD keeps all three stored versions. The fixed batches repeat the design graph 512 times and the audit graph 8,192 times.</p>
-    <p>COMMIT denotes an accepted composition in this walkthrough. The demo does not write peer state or execute distributed commit.</p>
-    <p class="scope">Each batch contains one unique hand-authored probe. Repeated inputs illustrate the calculation and do not provide independent-sampling evidence. This walkthrough includes no learner training, benchmark evaluation, or empirical estimate of audit power.</p>
+    <div>
+      <h1>VCIA decision walkthrough</h1>
+      <p>Follow two worked examples of version selection and admission. Each proposal names the peers that switch to current versions. HOLD retains all stored versions.</p>
+    </div>
+    <dl class="setup" aria-label="Walkthrough settings">
+      <div><dt>Peers</dt><dd>3</dd></div>
+      <div><dt>Replacement quota</dt><dd>2</dd></div>
+      <div><dt>Design batch</dt><dd>512 repeats</dd></div>
+      <div><dt>Audit batch</dt><dd>8,192 repeats</dd></div>
+    </dl>
   </header>
 
-<article><h2>Screening can exclude a cancelling pair</h2><p>Peers 0 and 1 fail the individual screen. Together their changes cancel, so the Unscreened policy can commit both after audit.</p>
-<div class="table-region" role="region" aria-label="Policy outcomes (audit limits: drift 0.02, flip rate 0.01)" tabindex="0"><table><caption>Policy outcomes (audit limits: drift 0.02, flip rate 0.01)</caption><thead><tr><th scope="col">Policy</th><th scope="col">Proposed</th><th scope="col">Drift upper bound</th><th scope="col">Flip rate upper bound</th><th scope="col">Decision</th><th scope="col">Accepted current peers</th><th scope="col">Reason</th></tr></thead><tbody><tr><td>VCIA</td><td>None</td><td>n/a</td><td>n/a</td><td><span class="status hold">HOLD</span></td><td>None</td><td>insufficient eligible peers</td></tr><tr><td>Unscreened</td><td>[0, 1]</td><td>0.00241</td><td>0.00095</td><td><span class="status commit">COMMIT</span></td><td>[0, 1]</td><td>both bounds pass</td></tr></tbody></table></div>
-<details><summary>Hand-authored inputs (probability of cluster 0)<span class="row-count">3 rows</span></summary><div class="table-region" role="region" aria-label="Hand-authored inputs (probability of cluster 0)" tabindex="0"><table><caption>Hand-authored inputs (probability of cluster 0)</caption><thead><tr><th scope="col">Peer</th><th scope="col">Age</th><th scope="col">Design stored</th><th scope="col">Design current</th><th scope="col">Audit stored</th><th scope="col">Audit current</th></tr></thead><tbody><tr><td>0</td><td>1</td><td>0.70</td><td>1.00</td><td>0.70</td><td>1.00</td></tr><tr><td>1</td><td>1</td><td>0.70</td><td>0.40</td><td>0.70</td><td>0.40</td></tr><tr><td>2</td><td>1</td><td>0.70</td><td>0.70</td><td>0.70</td><td>0.70</td></tr></tbody></table></div></details>
-<details><summary>Individual screening (J upper bound &lt;= 0.10)<span class="row-count">3 rows</span></summary><div class="table-region" role="region" aria-label="Individual screening (J upper bound &lt;= 0.10)" tabindex="0"><table><caption>Individual screening (J upper bound &lt;= 0.10)</caption><thead><tr><th scope="col">Peer</th><th scope="col">Mean J</th><th scope="col">J upper bound</th><th scope="col">Eligible</th></tr></thead><tbody><tr><td>0</td><td>0.10000</td><td>0.14056</td><td>No</td></tr><tr><td>1</td><td>0.10000</td><td>0.14056</td><td>No</td></tr><tr><td>2</td><td>0.00000</td><td>0.04056</td><td>Yes</td></tr></tbody></table></div></details>
-<details><summary>All quota masks on the design batch<span class="row-count">3 rows</span></summary><div class="table-region" role="region" aria-label="All quota masks on the design batch" tabindex="0"><table><caption>All quota masks on the design batch</caption><thead><tr><th scope="col">Current peers</th><th scope="col">Updates H</th><th scope="col">Age sum A</th><th scope="col">Drift</th><th scope="col">Flip rate</th><th scope="col">Screened in</th><th scope="col">Design tolerances met</th></tr></thead><tbody><tr><td>[0, 1]</td><td>2</td><td>2</td><td>0.00000</td><td>0.00000</td><td>No</td><td>Yes</td></tr><tr><td>[0, 2]</td><td>1</td><td>1</td><td>0.10000</td><td>0.00000</td><td>No</td><td>No</td></tr><tr><td>[1, 2]</td><td>1</td><td>1</td><td>0.10000</td><td>0.00000</td><td>No</td><td>No</td></tr></tbody></table></div></details>
+<nav class="case-nav" aria-label="Walkthrough cases" hidden>
+<button type="button" aria-controls="case-1">1. Screening and cancellation</button>
+<button type="button" aria-controls="case-2">2. Ranking and audit</button>
+</nav>
+<article id="case-1" aria-labelledby="title-1"><h2 id="title-1">Screening can exclude a cancelling pair</h2><p class="case-summary">Peers 0 and 1 fail the individual screen. Together their changes cancel, so the Unscreened policy can commit both after audit.</p><p class="limits">Policy outcomes (audit limits: drift 0.02, flip rate 0.01)</p><div class="outcomes"><section class="outcome"><header><h3>VCIA</h3><span class="status hold">HOLD</span></header><p>Insufficient eligible peers.</p><dl class="values"><div><dt>Proposed current peers</dt><dd>None</dd></div><div><dt>Accepted current peers</dt><dd>None</dd></div><div><dt>Drift upper bound</dt><dd>n/a</dd></div><div><dt>Reassignment upper bound</dt><dd>n/a</dd></div></dl></section><section class="outcome"><header><h3>Unscreened</h3><span class="status commit">COMMIT</span></header><p>Both bounds pass.</p><dl class="values"><div><dt>Proposed current peers</dt><dd>[0, 1]</dd></div><div><dt>Accepted current peers</dt><dd>[0, 1]</dd></div><div><dt>Drift upper bound</dt><dd>0.00241</dd></div><div><dt>Reassignment upper bound</dt><dd>0.00095</dd></div></dl></section></div>
+<details><summary>Probe inputs</summary><div class="table-region" role="region" aria-label="Hand-authored inputs (probability of cluster 0)" tabindex="0"><table><caption>Hand-authored inputs (probability of cluster 0)</caption><thead><tr><th scope="col">Peer</th><th scope="col">Age</th><th scope="col">Design stored</th><th scope="col">Design current</th><th scope="col">Audit stored</th><th scope="col">Audit current</th></tr></thead><tbody><tr><th scope="row">0</th><td>1</td><td>0.70</td><td>1.00</td><td>0.70</td><td>1.00</td></tr><tr><th scope="row">1</th><td>1</td><td>0.70</td><td>0.40</td><td>0.70</td><td>0.40</td></tr><tr><th scope="row">2</th><td>1</td><td>0.70</td><td>0.70</td><td>0.70</td><td>0.70</td></tr></tbody></table></div></details>
+<details><summary>Individual screening</summary><div class="table-region" role="region" aria-label="Individual screening (J upper bound &lt;= 0.10)" tabindex="0"><table><caption>Individual screening (J upper bound &lt;= 0.10)</caption><thead><tr><th scope="col">Peer</th><th scope="col">Mean J</th><th scope="col">J upper bound</th><th scope="col">Eligible</th></tr></thead><tbody><tr><th scope="row">0</th><td>0.10000</td><td>0.14056</td><td>No</td></tr><tr><th scope="row">1</th><td>0.10000</td><td>0.14056</td><td>No</td></tr><tr><th scope="row">2</th><td>0.00000</td><td>0.04056</td><td>Yes</td></tr></tbody></table></div></details>
+<details><summary>Composition search</summary><div class="table-region" role="region" aria-label="All quota masks on the design batch" tabindex="0"><table><caption>All quota masks on the design batch</caption><thead><tr><th scope="col">Current peers</th><th scope="col">Updates H</th><th scope="col">Age sum A</th><th scope="col">Drift</th><th scope="col">Flip rate</th><th scope="col">Screened in</th><th scope="col">Design tolerances met</th></tr></thead><tbody><tr><th scope="row">[0, 1]</th><td>2</td><td>2</td><td>0.00000</td><td>0.00000</td><td>No</td><td>Yes</td></tr><tr><th scope="row">[0, 2]</th><td>1</td><td>1</td><td>0.10000</td><td>0.00000</td><td>No</td><td>No</td></tr><tr><th scope="row">[1, 2]</th><td>1</td><td>1</td><td>0.10000</td><td>0.00000</td><td>No</td><td>No</td></tr></tbody></table></div></details>
 </article>
-<article><h2>Ranking chooses the proposal and audit controls the commit</h2><p>All three masks pass design and have two detectable updates. VCIA proposes the largest total age and Drift-First proposes the smallest drift. Each policy audits its own fixed proposal once. VCIA commits, and Drift-First holds after its audit fails.</p>
-<div class="table-region" role="region" aria-label="Policy outcomes (audit limits: drift 0.02, flip rate 0.01)" tabindex="0"><table><caption>Policy outcomes (audit limits: drift 0.02, flip rate 0.01)</caption><thead><tr><th scope="col">Policy</th><th scope="col">Proposed</th><th scope="col">Drift upper bound</th><th scope="col">Flip rate upper bound</th><th scope="col">Decision</th><th scope="col">Accepted current peers</th><th scope="col">Reason</th></tr></thead><tbody><tr><td>VCIA</td><td>[0, 1]</td><td>0.00241</td><td>0.00095</td><td><span class="status commit">COMMIT</span></td><td>[0, 1]</td><td>both bounds pass</td></tr><tr><td>Drift-First</td><td>[0, 2]</td><td>0.11908</td><td>1.00000</td><td><span class="status hold">HOLD</span></td><td>None</td><td>audit fails on drift and assignment changes</td></tr></tbody></table></div>
-<details><summary>Hand-authored inputs (probability of cluster 0)<span class="row-count">3 rows</span></summary><div class="table-region" role="region" aria-label="Hand-authored inputs (probability of cluster 0)" tabindex="0"><table><caption>Hand-authored inputs (probability of cluster 0)</caption><thead><tr><th scope="col">Peer</th><th scope="col">Age</th><th scope="col">Design stored</th><th scope="col">Design current</th><th scope="col">Audit stored</th><th scope="col">Audit current</th></tr></thead><tbody><tr><td>0</td><td>9</td><td>0.65</td><td>0.68</td><td>0.55</td><td>0.25</td></tr><tr><td>1</td><td>6</td><td>0.65</td><td>0.64</td><td>0.55</td><td>0.85</td></tr><tr><td>2</td><td>1</td><td>0.65</td><td>0.62</td><td>0.55</td><td>0.50</td></tr></tbody></table></div></details>
-<details><summary>Individual screening (J upper bound &lt;= 0.10)<span class="row-count">3 rows</span></summary><div class="table-region" role="region" aria-label="Individual screening (J upper bound &lt;= 0.10)" tabindex="0"><table><caption>Individual screening (J upper bound &lt;= 0.10)</caption><thead><tr><th scope="col">Peer</th><th scope="col">Mean J</th><th scope="col">J upper bound</th><th scope="col">Eligible</th></tr></thead><tbody><tr><td>0</td><td>0.01000</td><td>0.05056</td><td>Yes</td></tr><tr><td>1</td><td>0.00333</td><td>0.04389</td><td>Yes</td></tr><tr><td>2</td><td>0.01000</td><td>0.05056</td><td>Yes</td></tr></tbody></table></div></details>
-<details><summary>All quota masks on the design batch<span class="row-count">3 rows</span></summary><div class="table-region" role="region" aria-label="All quota masks on the design batch" tabindex="0"><table><caption>All quota masks on the design batch</caption><thead><tr><th scope="col">Current peers</th><th scope="col">Updates H</th><th scope="col">Age sum A</th><th scope="col">Drift</th><th scope="col">Flip rate</th><th scope="col">Screened in</th><th scope="col">Design tolerances met</th></tr></thead><tbody><tr><td>[0, 1]</td><td>2</td><td>15</td><td>0.00667</td><td>0.00000</td><td>Yes</td><td>Yes</td></tr><tr><td>[0, 2]</td><td>2</td><td>10</td><td>0.00000</td><td>0.00000</td><td>Yes</td><td>Yes</td></tr><tr><td>[1, 2]</td><td>2</td><td>7</td><td>0.01333</td><td>0.00000</td><td>Yes</td><td>Yes</td></tr></tbody></table></div></details>
+<article id="case-2" aria-labelledby="title-2"><h2 id="title-2">Ranking chooses the proposal and audit controls the commit</h2><p class="case-summary">All three masks pass design and have two detectable updates. VCIA proposes the largest total age and Drift-First proposes the smallest drift. Each policy audits its own fixed proposal once. VCIA commits, and Drift-First holds after its audit fails.</p><p class="limits">Policy outcomes (audit limits: drift 0.02, flip rate 0.01)</p><div class="outcomes"><section class="outcome"><header><h3>VCIA</h3><span class="status commit">COMMIT</span></header><p>Both bounds pass.</p><dl class="values"><div><dt>Proposed current peers</dt><dd>[0, 1]</dd></div><div><dt>Accepted current peers</dt><dd>[0, 1]</dd></div><div><dt>Drift upper bound</dt><dd>0.00241</dd></div><div><dt>Reassignment upper bound</dt><dd>0.00095</dd></div></dl></section><section class="outcome"><header><h3>Drift-First</h3><span class="status hold">HOLD</span></header><p>Audit fails on drift and assignment changes.</p><dl class="values"><div><dt>Proposed current peers</dt><dd>[0, 2]</dd></div><div><dt>Accepted current peers</dt><dd>None</dd></div><div><dt>Drift upper bound</dt><dd>0.11908</dd></div><div><dt>Reassignment upper bound</dt><dd>1.00000</dd></div></dl></section></div>
+<details><summary>Probe inputs</summary><div class="table-region" role="region" aria-label="Hand-authored inputs (probability of cluster 0)" tabindex="0"><table><caption>Hand-authored inputs (probability of cluster 0)</caption><thead><tr><th scope="col">Peer</th><th scope="col">Age</th><th scope="col">Design stored</th><th scope="col">Design current</th><th scope="col">Audit stored</th><th scope="col">Audit current</th></tr></thead><tbody><tr><th scope="row">0</th><td>9</td><td>0.65</td><td>0.68</td><td>0.55</td><td>0.25</td></tr><tr><th scope="row">1</th><td>6</td><td>0.65</td><td>0.64</td><td>0.55</td><td>0.85</td></tr><tr><th scope="row">2</th><td>1</td><td>0.65</td><td>0.62</td><td>0.55</td><td>0.50</td></tr></tbody></table></div></details>
+<details><summary>Individual screening</summary><div class="table-region" role="region" aria-label="Individual screening (J upper bound &lt;= 0.10)" tabindex="0"><table><caption>Individual screening (J upper bound &lt;= 0.10)</caption><thead><tr><th scope="col">Peer</th><th scope="col">Mean J</th><th scope="col">J upper bound</th><th scope="col">Eligible</th></tr></thead><tbody><tr><th scope="row">0</th><td>0.01000</td><td>0.05056</td><td>Yes</td></tr><tr><th scope="row">1</th><td>0.00333</td><td>0.04389</td><td>Yes</td></tr><tr><th scope="row">2</th><td>0.01000</td><td>0.05056</td><td>Yes</td></tr></tbody></table></div></details>
+<details><summary>Composition search</summary><div class="table-region" role="region" aria-label="All quota masks on the design batch" tabindex="0"><table><caption>All quota masks on the design batch</caption><thead><tr><th scope="col">Current peers</th><th scope="col">Updates H</th><th scope="col">Age sum A</th><th scope="col">Drift</th><th scope="col">Flip rate</th><th scope="col">Screened in</th><th scope="col">Design tolerances met</th></tr></thead><tbody><tr><th scope="row">[0, 1]</th><td>2</td><td>15</td><td>0.00667</td><td>0.00000</td><td>Yes</td><td>Yes</td></tr><tr><th scope="row">[0, 2]</th><td>2</td><td>10</td><td>0.00000</td><td>0.00000</td><td>Yes</td><td>Yes</td></tr><tr><th scope="row">[1, 2]</th><td>2</td><td>7</td><td>0.01333</td><td>0.00000</td><td>Yes</td><td>Yes</td></tr></tbody></table></div></details>
 </article>
-</main></body></html>
+  <footer class="scope">
+    <p>Each batch repeats one hand-authored probe to illustrate the calculations. The audit's independent-sampling guarantee requires fresh independent draws. COMMIT denotes acceptance in the walkthrough.</p>
+  </footer>
+</main>
+<script>
+  const nav = document.querySelector('.case-nav');
+  const buttons = [...nav.querySelectorAll('button')];
+  function showCase(active) {
+    for (const button of buttons) {
+      const selected = button === active;
+      button.setAttribute('aria-pressed', String(selected));
+      document.getElementById(button.getAttribute('aria-controls')).hidden = !selected;
+    }
+  }
+  for (const button of buttons) {
+    button.addEventListener('click', () => showCase(button));
+  }
+  // Both cases remain readable when scripting is disabled.
+  showCase(buttons[0]);
+  nav.hidden = false;
+</script>
+</body>
+</html>
